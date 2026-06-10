@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login | Member Area</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .login-card { background: #ffffff; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 400px; border: 1px solid #e2e8f0; }
+        h2 { color: #1e293b; text-align: center; margin-bottom: 25px; }
+        input { width: 100%; padding: 14px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #3b82f6; border: none; border-radius: 10px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>সদস্য লগইন</h2>
+    <input type="email" id="email" placeholder="আপনার ইমেইল">
+    <input type="password" id="password" placeholder="পাসওয়ার্ড">
+    <button onclick="userLogin()">লগইন করুন</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+
+    // কনফিগ
+    const firebaseConfig = {
+        apiKey: "AIzaSyBN2LmaMk5JAZOUFsARaFbiE1QHAR9VnC4",
+        authDomain: "jdbillora1.firebaseapp.com",
+        projectId: "jdbillora1",
+        storageBucket: "jdbillora1.firebasestorage.app",
+        messagingSenderId: "200694561494",
+        appId: "1:200694561494:web:f2f7f80cbd1f3849086777"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // আগে থেকেই লগইন করা থাকলে সরাসরি user.html এ পাঠিয়ে দিন
+    if (localStorage.getItem("userLoggedIn")) {
+        window.location.href = "user.html";
+    }
+
+    window.userLogin = async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            // লোকাল স্টোরেজে সেট করুন
+            localStorage.setItem("userLoggedIn", "true");
+            localStorage.setItem("userEmail", email); // ইউজারের ইমেইল মনে রাখার জন্য
+            window.location.href = "user.html";
+        } catch (error) {
+            alert("লগইন ব্যর্থ হয়েছে: " + error.message);
+        }
+    };
+</script>
+</body>
+</html>
