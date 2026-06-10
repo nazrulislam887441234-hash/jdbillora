@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Professional Invoice</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --primary: #0e1b3a; --gold: #c5a059; --yellow: #fffdf0; }
         body { background: #e0e0e0; margin: 0; padding: 20px; }
@@ -39,18 +40,16 @@
             pointer-events: none;
         }
         
-        /* QR and Payment Box - Flex layout for equal height */
         .qr-trans-container { display: flex; gap: 15px; margin-top: 25px; align-items: stretch; }
         #qrcode { padding: 10px; border: 1px solid var(--gold); background: white; border-radius: 8px; }
         #qrcode img { width: 100px; height: 100px; }
         
-        .btn { display: block; width: 200px; margin: 20px auto; padding: 15px; background: #22c55e; color: white; text-align: center; cursor: pointer; border-radius: 5px; }
-        @media print { .btn { display: none; } }
+        .btn { display: block; width: 200px; margin: 20px auto; padding: 15px; background: #22c55e; color: white; text-align: center; cursor: pointer; border-radius: 5px; border: none; font-size: 16px; }
     </style>
 </head>
 <body>
 
-<div class="invoice-box">
+<div class="invoice-box" id="invoiceArea">
     <div class="header">
         <img id="logo" width="80">
         <h1 id="topName"></h1>
@@ -85,7 +84,7 @@
     <div style="text-align:center; margin-top:20px; font-weight:bold; color:var(--primary);">Thank you for using our service, I hope you feel good and come again.</div>
 </div>
 
-<button class="btn" onclick="window.print()">Download PDF</button>
+<button class="btn" onclick="downloadJPG()">Download JPG</button>
 
 <script>
     const d = JSON.parse(localStorage.getItem("invData"));
@@ -107,6 +106,17 @@
         tbody.innerHTML += `<tr><td>1</td><td>${item.desc}</td><td>${item.price}</td><td>${item.price}</td></tr>`;
     });
     document.getElementById('totalDisplay').innerText = "TOTAL: BDT " + total;
+
+    // JPG ডাউনলোডের ফাংশন
+    function downloadJPG() {
+        const element = document.getElementById("invoiceArea");
+        html2canvas(element, { scale: 2 }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'invoice.jpg';
+            link.href = canvas.toDataURL("image/jpeg", 1.0);
+            link.click();
+        });
+    }
 </script>
 </body>
 </html>
