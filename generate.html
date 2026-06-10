@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Invoice</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f8fafc; }
+        .form-container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        .btn-gen { background: #22c55e; width: 100%; padding: 15px; border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>ইনভয়েস তথ্য</h2>
+        <input type="text" id="shopName" placeholder="দোকানের নাম" required>
+        <input type="file" id="shopLogo" accept="image/*">
+        <input type="text" id="shopPhone" placeholder="ফোন নাম্বার" required>
+        <input type="email" id="shopEmail" placeholder="ইমেইল" required>
+        <h3>কাস্টমার তথ্য</h3>
+        <input type="text" id="custCompany" placeholder="কোম্পানির নাম">
+        <input type="text" id="custName" placeholder="কাস্টমারের নাম">
+        <input type="text" id="custAddress" placeholder="ঠিকানা">
+        <input type="tel" id="custPhone" placeholder="মোবাইল নাম্বার">
+        
+        <input type="text" id="qrText" placeholder="QR কোড এ যা লিখতে চান">
+        <input type="text" id="paymentMethod" placeholder="পেমেন্ট মাধ্যম (বিকাশ/নগদ)">
+        <input type="text" id="transId" placeholder="ট্রানজেকশন আইডি">
+       
+        <div id="itemsContainer">
+            <div class="item-row"><input type="text" class="desc" placeholder="সার্ভিস"> <input type="number" class="price" placeholder="দাম"></div>
+        </div>
+        <button onclick="addItem()">+ আরও সার্ভিস</button>
+        <input type="text" id="terms" placeholder="Terms & Conditions">
+        <p>সিগনেচার:</p><input type="file" id="signature" accept="image/*">
+        <button class="btn-gen" onclick="saveData()">প্রিভিউ ও ডাউনলোড</button>
+    </div>
+
+    <script>
+        function addItem() {
+            const div = document.createElement('div');
+            div.innerHTML = `<div class="item-row"><input type="text" class="desc" placeholder="সার্ভিস"> <input type="number" class="price" placeholder="দাম"></div>`;
+            document.getElementById('itemsContainer').appendChild(div);
+        }
+        async function toBase64(file) { 
+            if(!file) return "";
+            return new Promise((res) => { const r = new FileReader(); r.onloadend = () => res(r.result); r.readAsDataURL(file); }); 
+        }
+        async function saveData() {
+            let items = [];
+            document.querySelectorAll('.item-row').forEach(row => {
+                let desc = row.querySelector('.desc').value;
+                let price = parseFloat(row.querySelector('.price').value) || 0;
+                if(desc) items.push({ desc: desc, price: price });
+            });
+
+            const data = {
+                shopName: document.getElementById('shopName').value,
+                shopPhone: document.getElementById('shopPhone').value,
+                shopEmail: document.getElementById('shopEmail').value,
+                custName: document.getElementById('custName').value,
+                custCompany: document.getElementById('custCompany').value,
+                custAddress: document.getElementById('custAddress').value,
+                custPhone: document.getElementById('custPhone').value,
+                qrText: document.getElementById('qrText').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                transId: document.getElementById('transId').value,
+                items: items,
+                logo: await toBase64(document.getElementById('shopLogo').files[0]),
+                sig: await toBase64(document.getElementById('signature').files[0]),
+                terms: document.getElementById('terms').value
+            };
+            localStorage.setItem("invData", JSON.stringify(data));
+            window.location.href = "preview.html";
+        }
+    </script>
+</body>
+</html>
