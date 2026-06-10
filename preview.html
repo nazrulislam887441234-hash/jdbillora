@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Professional Invoice</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --primary: #0e1b3a; --gold: #c5a059; --yellow: #fffdf0; }
+        body { background: #e0e0e0; margin: 0; padding: 20px; }
+        
+        .invoice-box { 
+            width: 210mm; 
+            min-height: 297mm; 
+            background: var(--yellow); 
+            margin: auto; 
+            padding: 15mm; 
+            box-sizing: border-box; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.2); 
+            position: relative; 
+        }
+
+        .header { display: flex; align-items: center; border-bottom: 4px solid var(--gold); padding-bottom: 20px; }
+        .header h1 { color: var(--primary); margin-left: 15px; flex-grow: 1; text-align: right; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .box { border: 1px solid var(--gold); padding: 15px; border-radius: 8px; background: white; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: var(--primary); color: white; padding: 12px; }
+        td { border-bottom: 1px solid #ddd; padding: 10px; text-align: center; }
+        .total-row { background: var(--gold); color: white; padding: 10px; text-align: right; font-weight: bold; font-size: 18px; margin-top: 10px; }
+        
+        .paid-stamp { 
+            position: absolute; 
+            top: 450px; 
+            left: 50%; 
+            transform: translateX(-50%) rotate(-10deg); 
+            width: 180px; 
+            opacity: 0.6; 
+            pointer-events: none;
+        }
+        
+        /* QR and Payment Box - Flex layout for equal height */
+        .qr-trans-container { display: flex; gap: 15px; margin-top: 25px; align-items: stretch; }
+        #qrcode { padding: 10px; border: 1px solid var(--gold); background: white; border-radius: 8px; }
+        #qrcode img { width: 100px; height: 100px; }
+        
+        .btn { display: block; width: 200px; margin: 20px auto; padding: 15px; background: #22c55e; color: white; text-align: center; cursor: pointer; border-radius: 5px; }
+        @media print { .btn { display: none; } }
+    </style>
+</head>
+<body>
+
+<div class="invoice-box">
+    <div class="header">
+        <img id="logo" width="80">
+        <h1 id="topName"></h1>
+    </div>
+    <div class="info-grid">
+        <div class="box"><h4>SERVICE PROVIDER</h4><p id="sInfo"></p></div>
+        <div class="box"><h4>INVOICE DETAILS</h4><p id="meta"></p></div>
+    </div>
+    <div class="box"><h4>BILL TO</h4><p id="cInfo"></p></div>
+    
+    <img src="https://i.ibb.co.com/6RJmX6Vc/20260610-093938.png" class="paid-stamp">
+    
+    <table>
+        <thead><tr><th>QTY</th><th>DESCRIPTION</th><th>UNIT PRICE</th><th>AMOUNT</th></tr></thead>
+        <tbody id="itemsBody"></tbody>
+    </table>
+
+    <div class="total-row" id="totalDisplay"></div>
+
+    <div class="qr-trans-container">
+        <div id="qrcode"></div>
+        <div class="box" style="flex-grow: 1;">
+            <h4>PAYMENT DETAILS</h4>
+            <p id="payInfo"></p>
+        </div>
+    </div>
+
+    <div style="text-align:right; margin-top:30px;">
+        <img id="sig" width="100"><br><span style="border-top:1px solid #000;">Authorized Signature</span>
+    </div>
+    <div id="termsText" style="margin-top:20px; font-size:12px;"></div>
+    <div style="text-align:center; margin-top:20px; font-weight:bold; color:var(--primary);">Thank you for using our service, I hope you feel good and come again.</div>
+</div>
+
+<button class="btn" onclick="window.print()">Download PDF</button>
+
+<script>
+    const d = JSON.parse(localStorage.getItem("invData"));
+    document.getElementById('logo').src = d.logo;
+    document.getElementById('topName').innerText = d.shopName;
+    document.getElementById('sInfo').innerHTML = `<strong>${d.shopName}</strong><br>Phone: ${d.shopPhone}<br>Email: ${d.shopEmail}`;
+    document.getElementById('cInfo').innerHTML = `<strong>${d.custCompany}</strong><br>${d.custName}<br>${d.custAddress}<br>Phone: ${d.custPhone}`;
+    document.getElementById('payInfo').innerHTML = `Method: ${d.paymentMethod}<br>Trans ID: ${d.transId}`;
+    document.getElementById('sig').src = d.sig;
+    document.getElementById('termsText').innerHTML = "<strong>TERMS:</strong> " + d.terms;
+    document.getElementById('meta').innerHTML = `Invoice #: JD-${Math.floor(Math.random()*9000)+1000}<br>Date: ${new Date().toLocaleDateString()}`;
+    
+    new QRCode(document.getElementById("qrcode"), {text: d.qrText || "No Data", width: 100, height: 100});
+
+    let total = 0;
+    let tbody = document.getElementById('itemsBody');
+    d.items.forEach(item => {
+        total += parseFloat(item.price);
+        tbody.innerHTML += `<tr><td>1</td><td>${item.desc}</td><td>${item.price}</td><td>${item.price}</td></tr>`;
+    });
+    document.getElementById('totalDisplay').innerText = "TOTAL: BDT " + total;
+</script>
+</body>
+</html>
