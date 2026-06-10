@@ -2,60 +2,26 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login | Secure Access</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #0f172a; }
-        .login-card { background: #1e293b; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 400px; color: white; }
-        h2 { text-align: center; margin-bottom: 1.5rem; color: #38bdf8; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
-        button { width: 100%; padding: 12px; background: #38bdf8; border: none; border-radius: 8px; color: #0f172a; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        button:hover { background: #0ea5e9; }
+        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; font-family: sans-serif; }
+        .lock-container { text-align: center; background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; }
+        h1 { color: #d9534f; }
+        p { color: #555; line-height: 1.6; }
+        .footer { margin-top: 20px; font-size: 0.8em; color: #999; }
     </style>
 </head>
 <body>
 
-<div class="login-card">
-    <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="Email Address">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="handleLogin()">Login</button>
+<div class="lock-container">
+    <h1>অ্যাক্সেস সীমাবদ্ধ</h1>
+    <p id="message">সিস্টেমটি বর্তমানে ডেভেলপার দ্বারা লক করা হয়েছে। প্রফেশনাল কাজের ভ্যালু এবং এগ্রিমেন্ট অমান্য করার কারণে এই পদক্ষেপ নেওয়া হয়েছে। বিস্তারিত তথ্যের জন্য ডেভেলপারের সাথে যোগাযোগ করুন।</p>
+    <div class="footer">© ২০২৩-২০২৬ সকল স্বত্ব সংরক্ষিত।</div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBN2LmaMk5JAZOUFsARaFbiE1QHAR9VnC4",
-        authDomain: "jdbillora1.firebaseapp.com",
-        projectId: "jdbillora1",
-        storageBucket: "jdbillora1.firebasestorage.app",
-        messagingSenderId: "200694561494",
-        appId: "1:200694561494:web:f2f7f80cbd1f3849086777"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // চেক করুন ইউজার আগে থেকেই লগইন করা কি না
-    if (localStorage.getItem("adminLoggedIn")) {
-        window.location.href = "admin.html";
-    }
-
-    window.handleLogin = async () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            localStorage.setItem("adminLoggedIn", "true");
-            window.location.href = "admin.html";
-        } catch (error) {
-            alert("Login Failed: " + error.message);
-        }
-    };
+<script>
+    // আপনি চাইলে এখান থেকে মেসেজটি পরিবর্তন করতে পারবেন
+    console.log("App access restricted by developer.");
 </script>
+
 </body>
 </html>
