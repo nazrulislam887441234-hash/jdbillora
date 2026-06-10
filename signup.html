@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New User | Admin Panel</title>
+    <style>
+        /* ফিক্সড ব্যাকগ্রাউন্ড এবং সেন্টারিং */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f8fafc; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+
+        /* কার্ডের প্রিমিয়াম ডিজাইন */
+        .card { 
+            background: #ffffff; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
+            width: 100%; 
+            max-width: 400px;
+            border: 1px solid #e2e8f0;
+        }
+
+        h2 { color: #1e293b; margin-bottom: 25px; text-align: center; font-weight: 700; }
+
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; color: #64748b; font-size: 0.9rem; }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 10px; 
+            font-size: 16px;
+            transition: 0.3s;
+            outline: none;
+        }
+        input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: #3b82f6; 
+            border: none; 
+            border-radius: 10px; 
+            color: white; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        button:hover { background: #2563eb; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>নতুন ইউজার যোগ করুন</h2>
+    <div class="input-group"><input type="text" id="name" placeholder="পুরো নাম"></div>
+    <div class="input-group"><input type="text" id="phone" placeholder="ফোন নাম্বার"></div>
+    <div class="input-group"><input type="email" id="email" placeholder="ইমেইল অ্যাড্রেস"></div>
+    <div class="input-group"><input type="password" id="password" placeholder="পাসওয়ার্ড"></div>
+    <button onclick="handleSignup()">ইউজার তৈরি করুন</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+
+    // অথ চেক
+    if (!localStorage.getItem("adminLoggedIn")) {
+        window.location.href = "index.html";
+    }
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBN2LmaMk5JAZOUFsARaFbiE1QHAR9VnC4",
+        authDomain: "jdbillora1.firebaseapp.com",
+        projectId: "jdbillora1",
+        storageBucket: "jdbillora1.firebasestorage.app",
+        messagingSenderId: "200694561494",
+        appId: "1:200694561494:web:f2f7f80cbd1f3849086777"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.handleSignup = async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        if(!email || !password) {
+            alert("দয়া করে ইমেইল এবং পাসওয়ার্ড দিন!");
+            return;
+        }
+
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            alert("সফলভাবে নতুন ইউজার তৈরি হয়েছে!");
+            // ইনপুট খালি করে দিন
+            document.querySelectorAll('input').forEach(input => input.value = '');
+        } catch (error) {
+            alert("ত্রুটি: " + error.message);
+        }
+    };
+</script>
+</body>
+</html>
