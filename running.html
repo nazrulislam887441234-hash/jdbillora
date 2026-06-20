@@ -3,84 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আধুনিক পেডোমিটার</title>
+    <title>Modern Pedometer</title>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            color: white;
-        }
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            padding: 2rem;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            width: 300px;
-        }
-        h1 { font-size: 1.5rem; margin-bottom: 20px; }
-        .steps { font-size: 3rem; font-weight: bold; margin: 20px 0; }
-        button {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            margin: 5px;
-        }
-        .btn-start { background: #00ff88; color: #000; }
-        .btn-clear { background: #ff4757; color: #fff; }
-        button:active { transform: scale(0.95); }
+        body { background: #1a1a2e; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: sans-serif; }
+        .card { background: #16213e; padding: 2rem; border-radius: 20px; text-align: center; width: 80%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { font-size: 1.2rem; }
+        #stepCount { font-size: 4rem; margin: 10px 0; color: #4ecca3; }
+        button { padding: 15px 30px; border: none; border-radius: 10px; cursor: pointer; font-size: 1rem; margin: 5px; }
+        .start { background: #4ecca3; }
+        .clear { background: #e94560; color: white; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1>আপনার হাঁটা</h1>
-    <div class="steps" id="stepCount">0</div>
-    <p>ধাপ সম্পন্ন হয়েছে</p>
-    <button class="btn-start" onclick="startTracking()">শুরু করুন</button>
-    <button class="btn-clear" onclick="clearData()">ক্লিয়ার</button>
+    <h1>আমার পদক্ষেপ</h1>
+    <div id="stepCount">0</div>
+    <button class="start" onclick="requestPermission()">অনুমতি ও শুরু</button>
+    <button class="clear" onclick="clearData()">রিসেট</button>
 </div>
 
 <script>
-    let steps = localStorage.getItem('steps') ? parseInt(localStorage.getItem('steps')) : 0;
+    let steps = parseInt(localStorage.getItem('steps')) || 0;
     document.getElementById('stepCount').innerText = steps;
 
-    // মোশন সেন্সর অ্যাক্সেস করা
-    function startTracking() {
-        if (typeof(DeviceMotionEvent) !== 'undefined' && typeof(DeviceMotionEvent.requestPermission) === 'function') {
-            DeviceMotionEvent.requestPermission().then(response => {
-                if (response == 'granted') {
-                    window.addEventListener('devicemotion', handleMotion);
-                }
-            });
+    function requestPermission() {
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            DeviceMotionEvent.requestPermission()
+                .then(response => {
+                    if (response == 'granted') {
+                        window.addEventListener('devicemotion', trackSteps);
+                    }
+                })
+                .catch(console.error);
         } else {
-            window.addEventListener('devicemotion', handleMotion);
+            // অ্যান্ড্রয়েডের জন্য সরাসরি
+            window.addEventListener('devicemotion', trackSteps);
         }
     }
 
-    function handleMotion(event) {
+    let lastAcc = 0;
+    function trackSteps(event) {
         let acc = event.accelerationIncludingGravity;
-        if (acc.x > 10 || acc.y > 10) { // সাধারণ গতির সীমা
+        let totalAcc = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
+        
+        // ধাপের সংবেদনশীলতা চেক (এটি সাধারণত ৩-৫ এর মাঝে থাকে)
+        if (totalAcc - lastAcc > 8) {
             steps++;
             document.getElementById('stepCount').innerText = steps;
             localStorage.setItem('steps', steps);
         }
+        lastAcc = totalAcc;
     }
 
     function clearData() {
         steps = 0;
-        localStorage.setItem('steps', steps);
-        document.getElementById('stepCount').innerText = steps;
+        localStorage.setItem('steps', 0);
+        document.getElementById('stepCount').innerText = 0;
     }
 </script>
 </body>
